@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<title>Organic Fertilizer Chatbot</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #e6ece8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.chat-container {
+    width: 420px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: #0a7d2c;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 12px 12px 0 0;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.user-msg {
+    background: #c8f7c5;
+    padding: 8px;
+    border-radius: 12px;
+    margin: 6px;
+    align-self: flex-end;
+    max-width: 80%;
+}
+
+.bot-msg {
+    background: #f0f0f0;
+    padding: 8px;
+    border-radius: 12px;
+    margin: 6px;
+    align-self: flex-start;
+    max-width: 80%;
+}
+
+.quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px;
+    border-top: 1px solid #ddd;
+}
+
+.quick-buttons button {
+    flex: 1 1 45%;
+    padding: 6px;
+    border: none;
+    border-radius: 8px;
+    background: #0a7d2c;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.quick-buttons button:hover {
+    background: #075a20;
+}
+
+.input-area {
+    display: flex;
+    border-top: 1px solid #ccc;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+}
+
+.send-btn {
+    background: #0a7d2c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        🌱 Organic Fertilizer Chatbot (Tamil)
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        <div class="bot-msg">
+            🤖 வணக்கம்! உங்கள் விவசாய சந்தேகத்தை கேளுங்கள்.
+        </div>
+    </div>
+
+    <!-- QUICK BUTTONS -->
+    <div class="quick-buttons">
+        <button onclick="quickSend('red soil')">🌱 Soil Info</button>
+        <button onclick="quickSend('what crop for black soil')">🌾 Crop Suggestion</button>
+        <button onclick="quickSend('leaf black dots')">🍃 Disease Help</button>
+        <button onclick="quickSend('fertilizer recommendation')">🌿 Fertilizer</button>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="இங்கே எழுதுங்கள்...">
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+async function sendMessage(messageText = null) {
+    const input = document.getElementById("userInput");
+    const message = messageText || input.value.trim();
+    if (message === "") return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+        addMessage(data.reply, "bot");
+
+    } catch (error) {
+        addMessage("❌ Server error", "bot");
+    }
+}
+
+function quickSend(text) {
+    sendMessage(text);
+}
+
+function addMessage(text, sender) {
+    const chatBox = document.getElementById("chatBox");
+    const div = document.createElement("div");
+    div.className = sender === "user" ? "user-msg" : "bot-msg";
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+
+</body>
+</html>
